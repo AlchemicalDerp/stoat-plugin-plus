@@ -31,6 +31,7 @@ function ensureUiStyles() {
     .stoat-delete { border:1px solid #7f2a2a; background:#391717; color:#ffd3d3; border-radius:8px; padding:6px 10px; cursor:pointer; width:100%; }
     #${SETTINGS_BUTTON_ID} { border: 1px solid #3e4f85; border-radius: 10px; background: #1b2441; color: #eef1ff; padding: 10px 12px; font-weight: 700; cursor: pointer; margin-top: 8px; width: 100%; text-align: left; }
     .stoat-placement-button { border-radius: 8px; border: 1px solid #2d4170; background:#1e2946; color:#e8ecff; cursor:pointer; padding:8px 12px; margin: 4px; }
+    #stoat-plugin-floating-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 3999; border: 1px solid #3e4f85; background:#1b2441; color:#eef1ff; border-radius: 999px; padding: 10px 14px; font-weight: 700; box-shadow: 0 12px 36px rgba(0,0,0,.4); cursor: pointer; display:none; }
   `;
 
   document.head.append(style);
@@ -236,35 +237,80 @@ function bootstrapPluginsPanel() {
   });
 }
 
-function mountSettingsButton() {
-  if (document.getElementById(SETTINGS_BUTTON_ID)) {
-    return;
-  }
+function isSettingsContext() {
+  return /settings/i.test(window.location.href);
+}
 
-  const settingsRoot =
-    document.querySelector("[aria-label*='Settings']") ??
-    Array.from(document.querySelectorAll("button, a, div"))
-      .find((element) => /settings/i.test(element.textContent ?? ""))
-      ?.closest("div");
+function normaliseLabel(text: string) {
+  return text.replace(/\s+/g, " ").trim().toLowerCase();
+}
 
-  if (!settingsRoot) {
+function findSettingsAnchor() {
+  const allCandidates = Array.from(
+    document.querySelectorAll<HTMLElement>("button, a, [role='button'], div"),
+  );
+
+  return allCandidates.find((element) => {
+    const text = normaliseLabel(element.textContent ?? "");
+    return text === "desktop" || text === "appearance" || text === "advanced";
+  });
+}
+
+function ensureFloatingLauncher() {
+  const existing = document.getElementById("stoat-plugin-floating-launcher") as
+    | HTMLButtonElement
+    | null;
+
+  if (existing) {
+    existing.style.display = isSettingsContext() ? "block" : "none";
     return;
   }
 
   const button = document.createElement("button");
-  button.id = SETTINGS_BUTTON_ID;
+  button.id = "stoat-plugin-floating-launcher";
   button.textContent = "Plugins";
   button.onclick = () => {
     bootstrapPluginsPanel();
     openPluginsPanel();
   };
 
-  settingsRoot.append(button);
+  button.style.display = isSettingsContext() ? "block" : "none";
+  document.body.append(button);
+}
+
+function mountSettingsButton() {
+  ensureFloatingLauncher();
+
+  if (document.getElementById(SETTINGS_BUTTON_ID) || !isSettingsContext()) {
+    return;
+  }
+
+  const anchor = findSettingsAnchor();
+
+  if (!anchor || !(anchor.parentElement instanceof HTMLElement)) {
+    return;
+  }
+
+  const button = document.createElement(anchor.tagName.toLowerCase());
+  button.id = SETTINGS_BUTTON_ID;
+  button.className = anchor.className;
+  button.setAttribute("role", anchor.getAttribute("role") ?? "button");
+  button.textContent = "Plugins";
+
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    bootstrapPluginsPanel();
+    openPluginsPanel();
+  });
+
+  anchor.parentElement.insertBefore(button, anchor.nextSibling);
 }
 
 function startPluginRuntime() {
   ensureUiStyles();
   bootstrapPluginsPanel();
+  ensureFloatingLauncher();
 
   window.desktopConfig.listPlugins().then((plugins) => {
     applyEnabledPluginStyles(plugins);
