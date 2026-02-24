@@ -2,6 +2,7 @@ import dbus from "@homebridge/dbus-native";
 
 import { NativeImage, app, ipcMain, nativeImage } from "electron";
 
+import { getOptionalAssetDataUrl } from "./assets";
 import { mainWindow } from "./window";
 
 // internal state
@@ -17,12 +18,11 @@ export async function setBadgeCount(count: number) {
         break;
       }
 
-      if (!nativeIcons[count])
+      if (!nativeIcons[count]) {
         nativeIcons[count] = nativeImage.createFromDataURL(
-          await import(
-            `../../assets/desktop/badges/${Math.min(count, 10)}.ico?asset`
-          ).then((asset) => asset.default),
+          getOptionalAssetDataUrl(`assets/desktop/badges/${Math.min(count, 10)}.ico`),
         );
+      }
 
       mainWindow.setOverlayIcon(
         nativeIcons[count],

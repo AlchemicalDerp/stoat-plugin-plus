@@ -103,32 +103,50 @@ async function openPluginsPanel() {
     const card = document.createElement("article");
     card.className = "stoat-plugin-card";
 
-    const swatches = plugin.swatches
-      .map(
-        (swatch) =>
-          `<div class="stoat-swatch" title="${swatch.key}: ${swatch.value}" style="background:${swatch.value}"></div>`,
-      )
-      .join("");
+    const head = document.createElement("div");
+    head.className = "stoat-plugin-head";
 
-    card.innerHTML = `
-      <div class="stoat-plugin-head">
-        <div>
-          <div class="stoat-plugin-name">${plugin.name}</div>
-          <div class="stoat-plugin-version">v${plugin.version}</div>
-        </div>
-        <div class="stoat-plugin-actions">
-          <button class="stoat-toggle">${plugin.enabled ? "Disable" : "Enable"}</button>
-          <button class="stoat-more">...</button>
-        </div>
-      </div>
-      <div class="stoat-swatches">${swatches}</div>
-      <div class="stoat-context">
-        <p>${plugin.description || "No description provided by this plugin."}</p>
-        <button class="stoat-delete">Delete plugin</button>
-      </div>
-    `;
+    const nameWrap = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "stoat-plugin-name";
+    name.textContent = plugin.name;
+    const version = document.createElement("div");
+    version.className = "stoat-plugin-version";
+    version.textContent = `v${plugin.version}`;
+    nameWrap.append(name, version);
 
-    const toggle = card.querySelector(".stoat-toggle") as HTMLButtonElement;
+    const actions = document.createElement("div");
+    actions.className = "stoat-plugin-actions";
+    const toggle = document.createElement("button");
+    toggle.className = "stoat-toggle";
+    toggle.textContent = plugin.enabled ? "Disable" : "Enable";
+    const more = document.createElement("button");
+    more.className = "stoat-more";
+    more.textContent = "...";
+    actions.append(toggle, more);
+    head.append(nameWrap, actions);
+
+    const swatches = document.createElement("div");
+    swatches.className = "stoat-swatches";
+    for (const swatch of plugin.swatches) {
+      const swatchEl = document.createElement("div");
+      swatchEl.className = "stoat-swatch";
+      swatchEl.title = `${swatch.key}: ${swatch.value}`;
+      swatchEl.style.background = swatch.value;
+      swatches.append(swatchEl);
+    }
+
+    const context = document.createElement("div");
+    context.className = "stoat-context";
+    const description = document.createElement("p");
+    description.textContent = plugin.description || "No description provided by this plugin.";
+    const del = document.createElement("button");
+    del.className = "stoat-delete";
+    del.textContent = "Delete plugin";
+    context.append(description, del);
+
+    card.append(head, swatches, context);
+
     toggle.onclick = async () => {
       const updated = await window.desktopConfig.togglePlugin(plugin.id);
       applyEnabledPluginStyles(updated);
@@ -136,8 +154,6 @@ async function openPluginsPanel() {
       await openPluginsPanel();
     };
 
-    const context = card.querySelector(".stoat-context") as HTMLDivElement;
-    const more = card.querySelector(".stoat-more") as HTMLButtonElement;
     more.onclick = (event) => {
       event.stopPropagation();
       document.querySelectorAll<HTMLElement>(".stoat-context").forEach((menu) => {
@@ -146,7 +162,6 @@ async function openPluginsPanel() {
       context.style.display = context.style.display === "block" ? "none" : "block";
     };
 
-    const del = card.querySelector(".stoat-delete") as HTMLButtonElement;
     del.onclick = async () => {
       await window.desktopConfig.deletePlugin(plugin.id);
       await openPluginsPanel();

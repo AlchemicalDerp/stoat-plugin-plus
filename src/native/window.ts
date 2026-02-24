@@ -9,9 +9,8 @@ import {
   nativeImage,
 } from "electron";
 
-import windowIconAsset from "../../assets/desktop/icon.png?asset";
-
 import { config } from "./config";
+import { getOptionalAssetDataUrl } from "./assets";
 import { updateTrayMenu } from "./tray";
 
 // global reference to main window
@@ -28,7 +27,9 @@ export const BUILD_URL = new URL(
 let shouldQuit = false;
 
 // load the window icon
-const windowIcon = nativeImage.createFromDataURL(windowIconAsset);
+const windowIcon = nativeImage.createFromDataURL(
+  getOptionalAssetDataUrl("assets/desktop/icon.png"),
+);
 
 // windowIcon.setTemplateImage(true);
 
