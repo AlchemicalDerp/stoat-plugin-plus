@@ -1,0 +1,19 @@
+:root {
+  --stoat-plugin-primary: #7f5af0;
+  --stoat-plugin-accent: #2cb67d;
+  --stoat-plugin-surface: #121626;
+}
+
+body {
+  background: radial-gradient(circle at top right, rgba(127, 90, 240, 0.15), transparent 35%),
+    radial-gradient(circle at 25% 20%, rgba(44, 182, 125, 0.1), transparent 45%);
+}
+
+button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(31, 42, 76, 0.35);
+}

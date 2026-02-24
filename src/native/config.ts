@@ -28,6 +28,9 @@ const schema = {
   discordRpc: {
     type: "boolean",
   } as JSONSchema.Boolean,
+  plugins: {
+    type: "array",
+  } as JSONSchema.Array,
   windowState: {
     type: "object",
     properties: {
@@ -60,6 +63,7 @@ const store = new Store({
     spellchecker: true,
     hardwareAcceleration: true,
     discordRpc: true,
+    plugins: [],
     windowState: {
       x: 0,
       y: 0,
@@ -83,6 +87,7 @@ class Config {
       spellchecker: this.spellchecker,
       hardwareAcceleration: this.hardwareAcceleration,
       discordRpc: this.discordRpc,
+      plugins: this.plugins,
       windowState: this.windowState,
     });
   }
@@ -204,6 +209,21 @@ class Config {
         set(k: string, value: DesktopConfig["windowState"]): void;
       }
     ).set("windowState", value);
+
+    this.sync();
+  }
+
+  get plugins() {
+    return (store as never as { get(k: string): DesktopPlugin[] }).get(
+      "plugins",
+    );
+  }
+
+  set plugins(value: DesktopPlugin[]) {
+    (store as never as { set(k: string, value: DesktopPlugin[]): void }).set(
+      "plugins",
+      value,
+    );
 
     this.sync();
   }

@@ -1,0 +1,22 @@
+{
+  "id": "base-look-plugin",
+  "name": "Base Look Plugin",
+  "version": "1.0.0",
+  "description": "Polishes base app styling, adds color swatches, and demonstrates button placement management.",
+  "cssFile": "theme.css",
+  "swatches": {
+    "primary": "#7f5af0",
+    "accent": "#2cb67d",
+    "surface": "#121626",
+    "muted": "#1b2441"
+  },
+  "buttonPlacements": [
+    {
+      "id": "open-stoat-site",
+      "label": "Visit Stoat",
+      "targetSelector": "body",
+      "position": "append",
+      "href": "https://stoat.chat"
+    }
+  ]
+}
