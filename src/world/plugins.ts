@@ -245,15 +245,20 @@ function normaliseLabel(text: string) {
   return text.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
-function findSettingsAnchor() {
+function findSourceCodeEntry() {
   const allCandidates = Array.from(
     document.querySelectorAll<HTMLElement>("button, a, [role='button'], div"),
   );
 
   return allCandidates.find((element) => {
     const text = normaliseLabel(element.textContent ?? "");
-    return text === "desktop" || text === "appearance" || text === "advanced";
+    return text === "source code";
   });
+}
+
+function openPanelFromSidebarEntry() {
+  bootstrapPluginsPanel();
+  openPluginsPanel();
 }
 
 function ensureFloatingLauncher() {
@@ -269,42 +274,46 @@ function ensureFloatingLauncher() {
   const button = document.createElement("button");
   button.id = "stoat-plugin-floating-launcher";
   button.textContent = "Plugins";
-  button.onclick = () => {
-    bootstrapPluginsPanel();
-    openPluginsPanel();
-  };
+  button.onclick = openPanelFromSidebarEntry;
 
   button.style.display = isSettingsContext() ? "block" : "none";
   document.body.append(button);
 }
 
+function convertSourceCodeEntry() {
+  if (!isSettingsContext()) {
+    return;
+  }
+
+  const sourceCodeEntry = findSourceCodeEntry();
+
+  if (!sourceCodeEntry) {
+    return;
+  }
+
+  if (sourceCodeEntry.dataset.stoatPluginBound === "1") {
+    return;
+  }
+
+  sourceCodeEntry.dataset.stoatPluginBound = "1";
+  sourceCodeEntry.textContent = "Plugins";
+  sourceCodeEntry.setAttribute("title", "Plugins");
+
+  sourceCodeEntry.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      openPanelFromSidebarEntry();
+    },
+    true,
+  );
+}
+
 function mountSettingsButton() {
   ensureFloatingLauncher();
-
-  if (document.getElementById(SETTINGS_BUTTON_ID) || !isSettingsContext()) {
-    return;
-  }
-
-  const anchor = findSettingsAnchor();
-
-  if (!anchor || !(anchor.parentElement instanceof HTMLElement)) {
-    return;
-  }
-
-  const button = document.createElement(anchor.tagName.toLowerCase());
-  button.id = SETTINGS_BUTTON_ID;
-  button.className = anchor.className;
-  button.setAttribute("role", anchor.getAttribute("role") ?? "button");
-  button.textContent = "Plugins";
-
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    bootstrapPluginsPanel();
-    openPluginsPanel();
-  });
-
-  anchor.parentElement.insertBefore(button, anchor.nextSibling);
+  convertSourceCodeEntry();
 }
 
 function startPluginRuntime() {
