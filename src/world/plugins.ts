@@ -32,9 +32,57 @@ function ensureUiStyles() {
     #${SETTINGS_BUTTON_ID} { border: 1px solid #3e4f85; border-radius: 10px; background: #1b2441; color: #eef1ff; padding: 10px 12px; font-weight: 700; cursor: pointer; margin-top: 8px; width: 100%; text-align: left; }
     .stoat-placement-button { border-radius: 8px; border: 1px solid #2d4170; background:#1e2946; color:#e8ecff; cursor:pointer; padding:8px 12px; margin: 4px; }
     #stoat-plugin-floating-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 3999; border: 1px solid #3e4f85; background:#1b2441; color:#eef1ff; border-radius: 999px; padding: 10px 14px; font-weight: 700; box-shadow: 0 12px 36px rgba(0,0,0,.4); cursor: pointer; display:none; }
+    #stoat-plugin-startup-alert { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 4100; min-width: 320px; max-width: 90vw; background: linear-gradient(135deg,#221a46,#15263f); border: 1px solid #4f6cc7; color:#eef3ff; border-radius: 12px; box-shadow: 0 18px 36px rgba(0,0,0,.45); padding: 12px 14px; display:none; }
+    #stoat-plugin-startup-alert strong { display:block; font-size:13px; letter-spacing:.2px; margin-bottom:2px; }
+    #stoat-plugin-startup-alert span { font-size:12px; opacity:.9; }
+    #stoat-plugin-startup-alert button { position:absolute; right:8px; top:8px; width:24px; height:24px; border-radius:999px; border:1px solid #4762b4; background:#1a2648; color:white; cursor:pointer; }
   `;
 
   document.head.append(style);
+}
+
+function showStartupAlert() {
+  const sessionKey = "stoat-plugin-manager-live";
+
+  if (sessionStorage.getItem(sessionKey) === "1") {
+    return;
+  }
+
+  sessionStorage.setItem(sessionKey, "1");
+
+  const existing = document.getElementById("stoat-plugin-startup-alert");
+  if (existing instanceof HTMLElement) {
+    existing.style.display = "block";
+    return;
+  }
+
+  const alert = document.createElement("div");
+  alert.id = "stoat-plugin-startup-alert";
+
+  const title = document.createElement("strong");
+  title.textContent = "Plugins manager is live";
+
+  const body = document.createElement("span");
+  body.textContent =
+    "You can open it from the Plugins sidebar item (replacing Source Code).";
+
+  const dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.textContent = "×";
+  dismiss.title = "Dismiss";
+  dismiss.onclick = () => {
+    alert.remove();
+  };
+
+  alert.append(title, body, dismiss);
+  document.body.append(alert);
+  alert.style.display = "block";
+
+  window.setTimeout(() => {
+    alert.style.opacity = "0";
+    alert.style.transition = "opacity .2s ease";
+    window.setTimeout(() => alert.remove(), 220);
+  }, 4200);
 }
 
 function applyEnabledPluginStyles(plugins: DesktopPlugin[]) {
@@ -320,6 +368,7 @@ function startPluginRuntime() {
   ensureUiStyles();
   bootstrapPluginsPanel();
   ensureFloatingLauncher();
+  showStartupAlert();
 
   window.desktopConfig.listPlugins().then((plugins) => {
     applyEnabledPluginStyles(plugins);
