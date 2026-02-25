@@ -36,6 +36,7 @@ function ensureUiStyles() {
     #stoat-plugin-startup-alert strong { display:block; font-size:13px; letter-spacing:.2px; margin-bottom:2px; }
     #stoat-plugin-startup-alert span { font-size:12px; opacity:.9; }
     #stoat-plugin-startup-alert button { position:absolute; right:8px; top:8px; width:24px; height:24px; border-radius:999px; border:1px solid #4762b4; background:#1a2648; color:white; cursor:pointer; }
+    #stoat-plugin-global-rail-entry { display:flex; align-items:center; justify-content:center; width:100%; min-height:42px; border-radius:10px; border:1px solid rgba(79,108,199,.6); background:linear-gradient(180deg,#2a2853,#20233d); color:#f2f5ff; font-size:12px; font-weight:700; letter-spacing:.2px; cursor:pointer; margin-bottom:8px; }
   `;
 
   document.head.append(style);
@@ -293,6 +294,55 @@ function normaliseLabel(text: string) {
   return text.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function findSettingsRailButton() {
+  const candidates = Array.from(
+    document.querySelectorAll<HTMLElement>("button, a, [role='button'], div"),
+  );
+
+  return candidates.find((element) => {
+    const text = normaliseLabel(element.textContent ?? "");
+    const aria = normaliseLabel(element.getAttribute("aria-label") ?? "");
+    const title = normaliseLabel(element.getAttribute("title") ?? "");
+
+    return (
+      text === "settings" ||
+      text === "open settings" ||
+      aria.includes("settings") ||
+      title.includes("settings")
+    );
+  });
+}
+
+function ensureGlobalRailPluginsEntry() {
+  const existing = document.getElementById("stoat-plugin-global-rail-entry");
+  const settingsButton = findSettingsRailButton();
+
+  if (!settingsButton || !(settingsButton.parentElement instanceof HTMLElement)) {
+    return;
+  }
+
+  if (existing instanceof HTMLElement) {
+    if (existing.parentElement !== settingsButton.parentElement) {
+      settingsButton.parentElement.insertBefore(existing, settingsButton);
+    }
+
+    return;
+  }
+
+  const entry = document.createElement("button");
+  entry.id = "stoat-plugin-global-rail-entry";
+  entry.type = "button";
+  entry.textContent = "Plugins";
+  entry.title = "Open Plugins";
+  entry.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openPanelFromSidebarEntry();
+  };
+
+  settingsButton.parentElement.insertBefore(entry, settingsButton);
+}
+
 function findSourceCodeEntry() {
   const allCandidates = Array.from(
     document.querySelectorAll<HTMLElement>("button, a, [role='button'], div"),
@@ -361,6 +411,7 @@ function convertSourceCodeEntry() {
 
 function mountSettingsButton() {
   ensureFloatingLauncher();
+  ensureGlobalRailPluginsEntry();
   convertSourceCodeEntry();
 }
 
