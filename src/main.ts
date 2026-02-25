@@ -7,6 +7,7 @@ import { autoLaunch } from "./native/autoLaunch";
 import { config } from "./native/config";
 import { initDiscordRpc } from "./native/discordRpc";
 import { initTray } from "./native/tray";
+import { initPluginIpc } from "./native/plugins";
 import { BUILD_URL, createMainWindow, mainWindow } from "./native/window";
 
 // Squirrel-specific logic
@@ -41,6 +42,7 @@ if (acquiredLock) {
   // create and configure the app when electron is ready
   app.on("ready", () => {
     // create window and application contexts
+    initPluginIpc();
     createMainWindow();
 
     // enable auto start on Windows and MacOS

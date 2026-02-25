@@ -21,6 +21,17 @@ Application for Windows, macOS, and Linux.
 
 - All downloads and instructions for Stoat can be found on our [Website](https://stoat.chat/download).
 
+
+## Plugins
+
+This build includes a desktop plugin manager under **Settings → Plugins**.
+
+- Install plugins by uploading a `.zip` file containing `plugin.json`.
+- Enable / disable installed plugins directly from the plugin list.
+- Use each plugin card's `...` menu to view its description and delete it.
+- See [`docs/plugins.md`](docs/plugins.md) for package format and modifiable fields.
+- A starter plugin is included at [`plugins/base-look-plugin`](plugins/base-look-plugin).
+
 ## Development Guide
 
 _Contribution guidelines for Desktop app TBA!_
