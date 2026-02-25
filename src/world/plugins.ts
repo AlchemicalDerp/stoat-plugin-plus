@@ -37,6 +37,8 @@ function ensureUiStyles() {
     #stoat-plugin-startup-alert span { font-size:12px; opacity:.9; }
     #stoat-plugin-startup-alert button { position:absolute; right:8px; top:8px; width:24px; height:24px; border-radius:999px; border:1px solid #4762b4; background:#1a2648; color:white; cursor:pointer; }
     #stoat-plugin-global-rail-entry { display:flex; align-items:center; justify-content:center; width:100%; min-height:42px; border-radius:10px; border:1px solid rgba(79,108,199,.6); background:linear-gradient(180deg,#2a2853,#20233d); color:#f2f5ff; font-size:12px; font-weight:700; letter-spacing:.2px; cursor:pointer; margin-bottom:8px; }
+    #stoat-plugin-dock-launcher { position: fixed; left: 4px; bottom: 56px; z-index: 4200; width: 28px; height: 28px; border-radius: 999px; border:1px solid #5874d4; background: linear-gradient(180deg,#2d3160,#1f2441); color:#f4f6ff; font-size:12px; font-weight: 800; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 8px 20px rgba(0,0,0,.45); }
+    #stoat-plugin-dock-launcher:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.5); }
   `;
 
   document.head.append(style);
@@ -294,6 +296,27 @@ function normaliseLabel(text: string) {
   return text.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function ensureDockLauncher() {
+  const existing = document.getElementById("stoat-plugin-dock-launcher");
+  if (existing instanceof HTMLButtonElement) {
+    return;
+  }
+
+  const button = document.createElement("button");
+  button.id = "stoat-plugin-dock-launcher";
+  button.type = "button";
+  button.textContent = "P";
+  button.title = "Open Plugins";
+  button.setAttribute("aria-label", "Open Plugins");
+  button.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openPanelFromSidebarEntry();
+  };
+
+  document.body.append(button);
+}
+
 function findSettingsRailButton() {
   const candidates = Array.from(
     document.querySelectorAll<HTMLElement>("button, a, [role='button'], div"),
@@ -411,6 +434,7 @@ function convertSourceCodeEntry() {
 
 function mountSettingsButton() {
   ensureFloatingLauncher();
+  ensureDockLauncher();
   ensureGlobalRailPluginsEntry();
   convertSourceCodeEntry();
 }
@@ -419,6 +443,7 @@ function startPluginRuntime() {
   ensureUiStyles();
   bootstrapPluginsPanel();
   ensureFloatingLauncher();
+  ensureDockLauncher();
   showStartupAlert();
 
   window.desktopConfig.listPlugins().then((plugins) => {
