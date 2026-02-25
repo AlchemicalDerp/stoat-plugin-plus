@@ -11,8 +11,8 @@ function ensureUiStyles() {
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
-    #${PANEL_ID}-backdrop { position: fixed; inset: 0; background: rgba(5,7,16,.5); backdrop-filter: blur(3px); z-index: 4000; display: none; }
-    #${PANEL_ID} { position: fixed; width: min(760px, 92vw); max-height: 84vh; overflow: auto; top: 8vh; left: 50%; transform: translateX(-50%); background: #121626; border: 1px solid #2f3b68; border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.5); padding: 18px; z-index: 4001; color: #eef1ff; display: none; }
+    #${PANEL_ID}-backdrop { position: fixed; inset: 0; background: rgba(5,7,16,.5); backdrop-filter: blur(3px); z-index: 2147483600; display: none; }
+    #${PANEL_ID} { position: fixed; width: min(760px, 92vw); max-height: 84vh; overflow: auto; top: 8vh; left: 50%; transform: translateX(-50%); background: #121626; border: 1px solid #2f3b68; border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.5); padding: 18px; z-index: 2147483601; color: #eef1ff; display: none; }
     #${PANEL_ID} h2 { margin: 0 0 12px; font-size: 20px; }
     .stoat-plugin-toolbar { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; }
     .stoat-plugin-install { background: linear-gradient(135deg,#7f5af0,#2cb67d); border: 0; color: white; border-radius: 10px; padding: 9px 14px; cursor:pointer; font-weight: 700; }
@@ -31,13 +31,13 @@ function ensureUiStyles() {
     .stoat-delete { border:1px solid #7f2a2a; background:#391717; color:#ffd3d3; border-radius:8px; padding:6px 10px; cursor:pointer; width:100%; }
     #${SETTINGS_BUTTON_ID} { border: 1px solid #3e4f85; border-radius: 10px; background: #1b2441; color: #eef1ff; padding: 10px 12px; font-weight: 700; cursor: pointer; margin-top: 8px; width: 100%; text-align: left; }
     .stoat-placement-button { border-radius: 8px; border: 1px solid #2d4170; background:#1e2946; color:#e8ecff; cursor:pointer; padding:8px 12px; margin: 4px; }
-    #stoat-plugin-floating-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 3999; border: 1px solid #3e4f85; background:#1b2441; color:#eef1ff; border-radius: 999px; padding: 10px 14px; font-weight: 700; box-shadow: 0 12px 36px rgba(0,0,0,.4); cursor: pointer; display:none; }
-    #stoat-plugin-startup-alert { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 4100; min-width: 320px; max-width: 90vw; background: linear-gradient(135deg,#221a46,#15263f); border: 1px solid #4f6cc7; color:#eef3ff; border-radius: 12px; box-shadow: 0 18px 36px rgba(0,0,0,.45); padding: 12px 14px; display:none; }
+    #stoat-plugin-floating-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 2147483599; border: 1px solid #3e4f85; background:#1b2441; color:#eef1ff; border-radius: 999px; padding: 10px 14px; font-weight: 700; box-shadow: 0 12px 36px rgba(0,0,0,.4); cursor: pointer; display:none; }
+    #stoat-plugin-startup-alert { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 2147483602; min-width: 320px; max-width: 90vw; background: linear-gradient(135deg,#221a46,#15263f); border: 1px solid #4f6cc7; color:#eef3ff; border-radius: 12px; box-shadow: 0 18px 36px rgba(0,0,0,.45); padding: 12px 14px; display:none; }
     #stoat-plugin-startup-alert strong { display:block; font-size:13px; letter-spacing:.2px; margin-bottom:2px; }
     #stoat-plugin-startup-alert span { font-size:12px; opacity:.9; }
     #stoat-plugin-startup-alert button { position:absolute; right:8px; top:8px; width:24px; height:24px; border-radius:999px; border:1px solid #4762b4; background:#1a2648; color:white; cursor:pointer; }
     #stoat-plugin-global-rail-entry { display:flex; align-items:center; justify-content:center; width:100%; min-height:42px; border-radius:10px; border:1px solid rgba(79,108,199,.6); background:linear-gradient(180deg,#2a2853,#20233d); color:#f2f5ff; font-size:12px; font-weight:700; letter-spacing:.2px; cursor:pointer; margin-bottom:8px; }
-    #stoat-plugin-dock-launcher { position: fixed; left: 4px; bottom: 56px; z-index: 4200; width: 28px; height: 28px; border-radius: 999px; border:1px solid #5874d4; background: linear-gradient(180deg,#2d3160,#1f2441); color:#f4f6ff; font-size:12px; font-weight: 800; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 8px 20px rgba(0,0,0,.45); }
+    #stoat-plugin-dock-launcher { position: fixed; left: 4px; bottom: 56px; z-index: 2147483603; width: 28px; height: 28px; border-radius: 999px; border:1px solid #5874d4; background: linear-gradient(180deg,#2d3160,#1f2441); color:#f4f6ff; font-size:12px; font-weight: 800; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 8px 20px rgba(0,0,0,.45); }
     #stoat-plugin-dock-launcher:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.5); }
   `;
 
@@ -308,11 +308,14 @@ function ensureDockLauncher() {
   button.textContent = "P";
   button.title = "Open Plugins";
   button.setAttribute("aria-label", "Open Plugins");
-  button.onclick = (event) => {
+  const onActivate = (event: Event) => {
     event.preventDefault();
     event.stopPropagation();
     openPanelFromSidebarEntry();
   };
+
+  button.onclick = onActivate;
+  button.onpointerdown = onActivate;
 
   document.body.append(button);
 }
@@ -357,11 +360,14 @@ function ensureGlobalRailPluginsEntry() {
   entry.type = "button";
   entry.textContent = "Plugins";
   entry.title = "Open Plugins";
-  entry.onclick = (event) => {
+  const onActivate = (event: Event) => {
     event.preventDefault();
     event.stopPropagation();
     openPanelFromSidebarEntry();
   };
+
+  entry.onclick = onActivate;
+  entry.onpointerdown = onActivate;
 
   settingsButton.parentElement.insertBefore(entry, settingsButton);
 }
@@ -377,9 +383,34 @@ function findSourceCodeEntry() {
   });
 }
 
-function openPanelFromSidebarEntry() {
+async function launchPluginManager() {
   bootstrapPluginsPanel();
-  openPluginsPanel();
+
+  const panel = document.getElementById(PANEL_ID);
+  const backdrop = document.getElementById(`${PANEL_ID}-backdrop`);
+
+  if (panel instanceof HTMLElement) {
+    panel.style.zIndex = "2147483601";
+  }
+
+  if (backdrop instanceof HTMLElement) {
+    backdrop.style.zIndex = "2147483600";
+  }
+
+  try {
+    await openPluginsPanel();
+  } catch (error) {
+    console.error("Failed to open plugins panel", error);
+
+    if (panel instanceof HTMLElement && backdrop instanceof HTMLElement) {
+      panel.style.display = "block";
+      backdrop.style.display = "block";
+    }
+  }
+}
+
+function openPanelFromSidebarEntry() {
+  void launchPluginManager();
 }
 
 function ensureFloatingLauncher() {
@@ -395,7 +426,12 @@ function ensureFloatingLauncher() {
   const button = document.createElement("button");
   button.id = "stoat-plugin-floating-launcher";
   button.textContent = "Plugins";
-  button.onclick = openPanelFromSidebarEntry;
+  button.onclick = () => openPanelFromSidebarEntry();
+  button.onpointerdown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openPanelFromSidebarEntry();
+  };
 
   button.style.display = isSettingsContext() ? "block" : "none";
   document.body.append(button);
